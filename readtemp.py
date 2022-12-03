@@ -42,7 +42,7 @@ try:
     blynk = BlynkLib.Blynk(open('blynk.auth', "r").read().replace("\n",""))
 except:
     print(datetime.datetime.now(),sys.exc_info())
-    
+
 @blynk.on("connected")
 def blynk_connected():
     print(datetime.datetime.now(),"Updating V3,V4 values from the server...")
@@ -62,6 +62,7 @@ def v4_write_handler(value):
 
 #@blynk.VIRTUAL_READ(2)
 def v2_read_handler():
+    global blynk
     y = float(read_temp()) 
     print(datetime.datetime.now(),"Current temp:",y,"min:",min_temp,"max:",max_temp)
     stat_rel=None
