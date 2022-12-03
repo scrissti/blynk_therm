@@ -38,7 +38,11 @@ def read_temp():
         temp_string = lines[1][equals_pos+2:]
         temp_c = float(temp_string) / 1000.0
         return temp_c
-
+try:
+    blynk = BlynkLib.Blynk(open('blynk.auth', "r").read().replace("\n",""))
+except:
+    print(datetime.datetime.now(),sys.exc_info())
+    
 @blynk.on("connected")
 def blynk_connected():
     print(datetime.datetime.now(),"Updating V3,V4 values from the server...")
