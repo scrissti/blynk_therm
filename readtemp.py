@@ -17,7 +17,7 @@ blynk=0
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(18, GPIO.OUT)
 GPIO.output(18, GPIO.LOW)
-print(datetime.now(),"Start up. setting relay to off.")
+print(datetime.datetime.now(),"Start up. setting relay to off.")
 min_temp=43
 max_temp=63
 stat_rel=0
@@ -26,7 +26,7 @@ try:
     BLYNK_AUTH = open('blynk.auth', "r").read()
     blynk = BlynkLib.Blynk(BLYNK_AUTH)
 except:
-    print(datetime.now(),"no internet for blynk")
+    print(datetime.datetime.now(),"no internet for blynk")
 
 def read_temp_raw():
     f = open(device_file, 'r')
@@ -47,33 +47,33 @@ def read_temp():
 
 @blynk.on("connected")
 def blynk_connected():
-    print(datetime.now(),"Updating V3,V4 values from the server...")
+    print(datetime.datetime.now(),"Updating V3,V4 values from the server...")
     blynk.sync_virtual(3,4)
 
 @blynk.on("V4")
 def v3_write_handler(value):
     global min_temp
     min_temp=int(value)
-    print(datetime.now(),"new min is ",value)
+    print(datetime.datetime.now(),"new min is ",value)
 
 @blynk.on("V4")
 def v4_write_handler(value):
     global max_temp
     max_temp=int(value)
-    print(datetime.now(),"new max is ",value)
+    print(datetime.datetime.now(),"new max is ",value)
 
 #@blynk.VIRTUAL_READ(2)
 def v2_read_handler():
     y = float(read_temp()) 
-    print(datetime.now(),"Current temp:",y,"min:",min_temp,"max:",max_temp)
+    print(datetime.datetime.now(),"Current temp:",y,"min:",min_temp,"max:",max_temp)
     stat_rel=None
 
     if y>max_temp:
-        print(datetime.now(),"setting relay to OFF ...")
+        print(datetime.datetime.now(),"setting relay to OFF ...")
         GPIO.output(18, GPIO.LOW)
         stat_rel = 0
     if y<min_temp:
-        print(datetime.now(),"setting relay to ON ...")
+        print(datetime.datetime.now(),"setting relay to ON ...")
         GPIO.output(18, GPIO.HIGH)
         stat_rel = 1
     try:
@@ -81,15 +81,15 @@ def v2_read_handler():
         if stat_rel:
             blynk.virtual_write(7,stat_rel)
     except:
-        print(datetime.now(),sys.exc_info()[0])
+        print(datetime.datetime.now(),sys.exc_info()[0])
 
 while True:
     try:
         blynk.run()
     except:
-        print(datetime.now(),sys.exc_info()[0])
+        print(datetime.datetime.now(),sys.exc_info()[0])
     try:
         v2_read_handler()
     except:
-        print(datetime.now(),sys.exc_info()[0])
+        print(datetime.datetime.now(),sys.exc_info()[0])
     time.sleep(10)
