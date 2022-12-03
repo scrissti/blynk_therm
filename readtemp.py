@@ -22,12 +22,6 @@ min_temp=43
 max_temp=63
 stat_rel=0
 
-try:
-    BLYNK_AUTH = open('blynk.auth', "r").read().replace("\n","")
-    blynk = BlynkLib.Blynk(BLYNK_AUTH)
-except:
-    print(datetime.datetime.now(),"no internet for blynk")
-
 def read_temp_raw():
     f = open(device_file, 'r')
     lines = f.readlines()
@@ -77,6 +71,7 @@ def v2_read_handler():
         GPIO.output(18, GPIO.HIGH)
         stat_rel = 1
     try:
+        blynk = BlynkLib.Blynk(open('blynk.auth', "r").read().replace("\n",""))
         blynk.virtual_write(2,y)
         if stat_rel:
             blynk.virtual_write(7,stat_rel)
