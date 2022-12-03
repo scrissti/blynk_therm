@@ -17,16 +17,16 @@ blynk=0
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(18, GPIO.OUT)
 GPIO.output(18, GPIO.LOW)
-print("off")
+print(datetime.now(),"Start up. setting relay to off.")
 min_temp=43
 max_temp=63
 stat_rel=0
 
 try:
-    BLYNK_AUTH = ''
+    BLYNK_AUTH = open('blynk.auth', "r").read()
     blynk = BlynkLib.Blynk(BLYNK_AUTH)
 except:
-    print("no internet for blynk")
+    print(datetime.now(),"no internet for blynk")
 
 def read_temp_raw():
     f = open(device_file, 'r')
@@ -45,51 +45,51 @@ def read_temp():
         temp_c = float(temp_string) / 1000.0
         return temp_c
 
-@blynk.VIRTUAL_WRITE(3)
+@blynk.on("connected")
+def blynk_connected():
+    print(datetime.now(),"Updating V3,V4 values from the server...")
+    blynk.sync_virtual(3,4)
+
+@blynk.on("V4")
 def v3_write_handler(value):
     global min_temp
-    min_temp=float(value)
-    print("new min is ",value)
+    min_temp=int(value)
+    print(datetime.now(),"new min is ",value)
 
-@blynk.VIRTUAL_WRITE(4)
+@blynk.on("V4")
 def v4_write_handler(value):
     global max_temp
-    max_temp=float(value)
-    print("new max is ",value)
+    max_temp=int(value)
+    print(datetime.now(),"new max is ",value)
 
-@blynk.VIRTUAL_READ(2)
+#@blynk.VIRTUAL_READ(2)
 def v2_read_handler():
-    y = float(read_temp()) #(np.cos(k*i/50.)*np.cos(i/50.)+np.random.randn(1))[0]
-    print(y)
-    print(min_temp)
-    print(max_temp)
+    y = float(read_temp()) 
+    print(datetime.now(),"Current temp:",y,"min:",min_temp,"max:",max_temp)
+    stat_rel=None
 
     if y>max_temp:
-        print("off")
+        print(datetime.now(),"setting relay to OFF ...")
         GPIO.output(18, GPIO.LOW)
         stat_rel = 0
     if y<min_temp:
-        print("on")
+        print(datetime.now(),"setting relay to ON ...")
         GPIO.output(18, GPIO.HIGH)
         stat_rel = 1
     try:
         blynk.virtual_write(2,y)
-        blynk.virtual_write(7,stat_rel)
+        if stat_rel:
+            blynk.virtual_write(7,stat_rel)
     except:
-        print(sys.exc_info()[0])
-
-def handler(signum, frame):
-    v2_read_handler()
-    signal.alarm(10)
-
-signal.signal(signal.SIGALRM, handler)
-signal.alarm(10)
-
-#try:
-blynk.run()
-#except:
-#    print "no net global"
+        print(datetime.now(),sys.exc_info()[0])
 
 while True:
-    v2_read_handler()
+    try:
+        blynk.run()
+    except:
+        print(datetime.now(),sys.exc_info()[0])
+    try:
+        v2_read_handler()
+    except:
+        print(datetime.now(),sys.exc_info()[0])
     time.sleep(10)
