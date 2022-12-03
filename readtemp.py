@@ -23,7 +23,7 @@ max_temp=63
 stat_rel=0
 
 try:
-    BLYNK_AUTH = open('blynk.auth', "r").read()
+    BLYNK_AUTH = open('blynk.auth', "r").read().replace("\n","")
     blynk = BlynkLib.Blynk(BLYNK_AUTH)
 except:
     print(datetime.datetime.now(),"no internet for blynk")
@@ -50,16 +50,16 @@ def blynk_connected():
     print(datetime.datetime.now(),"Updating V3,V4 values from the server...")
     blynk.sync_virtual(3,4)
 
-@blynk.on("V4")
+@blynk.on("V3")
 def v3_write_handler(value):
     global min_temp
-    min_temp=int(value)
+    min_temp=int(value[0])
     print(datetime.datetime.now(),"new min is ",value)
 
 @blynk.on("V4")
 def v4_write_handler(value):
     global max_temp
-    max_temp=int(value)
+    max_temp=int(value[0])
     print(datetime.datetime.now(),"new max is ",value)
 
 #@blynk.VIRTUAL_READ(2)
@@ -81,15 +81,15 @@ def v2_read_handler():
         if stat_rel:
             blynk.virtual_write(7,stat_rel)
     except:
-        print(datetime.datetime.now(),sys.exc_info()[0])
+        print(datetime.datetime.now(),sys.exc_info())
 
 while True:
     try:
         blynk.run()
     except:
-        print(datetime.datetime.now(),sys.exc_info()[0])
+        print(datetime.datetime.now(),sys.exc_info())
     try:
         v2_read_handler()
     except:
-        print(datetime.datetime.now(),sys.exc_info()[0])
-    time.sleep(10)
+        print(datetime.datetime.now(),sys.exc_info())
+    time.sleep(2)
