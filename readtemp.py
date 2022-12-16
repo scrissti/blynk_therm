@@ -60,8 +60,7 @@ def v4_write_handler(value):
     max_temp=int(value[0])
     print(datetime.datetime.now(),"new max is ",value)
 
-#@blynk.VIRTUAL_READ(2)
-def v2_read_handler():
+def process_state():
     global blynk
     y = float(read_temp()) 
     print(datetime.datetime.now(),"Current temp:",y,"min:",min_temp,"max:",max_temp)
@@ -76,7 +75,6 @@ def v2_read_handler():
         GPIO.output(18, GPIO.HIGH)
         stat_rel = 1
     try:
-        blynk = BlynkLib.Blynk(open('blynk.auth', "r").read().replace("\n",""))
         blynk.virtual_write(2,y)
         if stat_rel:
             blynk.virtual_write(7,stat_rel)
@@ -90,7 +88,7 @@ while True:
     except:
         print(datetime.datetime.now(),sys.exc_info())
     try:
-        v2_read_handler()
+        process_state()
     except:
         print(datetime.datetime.now(),sys.exc_info())
     time.sleep(2)
