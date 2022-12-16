@@ -51,13 +51,13 @@ def blynk_connected():
 @blynk.on("V3")
 def v3_write_handler(value):
     global min_temp
-    min_temp=int(value[0])
+    min_temp=float(value[0])
     print(datetime.datetime.now(),"new min is ",value)
 
 @blynk.on("V4")
 def v4_write_handler(value):
     global max_temp
-    max_temp=int(value[0])
+    max_temp=float(value[0])
     print(datetime.datetime.now(),"new max is ",value)
 
 def process_state():
