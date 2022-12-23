@@ -81,8 +81,7 @@ def process_state():
         stat_rel = 1
     try:
         blynk.virtual_write(2,y)
-        if stat_rel:
-            blynk.virtual_write(7,stat_rel)
+        blynk.virtual_write(7,stat_rel)
     except:
         print(datetime.datetime.now(),sys.exc_info())
 
