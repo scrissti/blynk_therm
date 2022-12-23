@@ -17,10 +17,17 @@ blynk=0
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(18, GPIO.OUT)
 GPIO.output(18, GPIO.LOW)
-print(datetime.datetime.now(),"Start up. setting relay to off.")
-min_temp=43
-max_temp=63
 stat_rel=0
+print(datetime.datetime.now(),"Start up. setting relay to off.")
+min_temp=39
+max_temp=59
+started=False
+
+try:
+    blynk = BlynkLib.Blynk(open('blynk.auth', "r").read().replace("\n",""))
+    started=True
+except:
+    print(datetime.datetime.now(),sys.exc_info())
 
 def read_temp_raw():
     f = open(device_file, 'r')
@@ -38,15 +45,6 @@ def read_temp():
         temp_string = lines[1][equals_pos+2:]
         temp_c = float(temp_string) / 1000.0
         return temp_c
-
-started=False
-while not started:
-    try:
-        blynk = BlynkLib.Blynk(open('blynk.auth', "r").read().replace("\n",""))
-        started=True
-    except:
-        print(datetime.datetime.now(),sys.exc_info())
-
 
 @blynk.on("connected")
 def blynk_connected():
@@ -69,7 +67,7 @@ def process_state():
     global blynk
     y = float(read_temp()) 
     print(datetime.datetime.now(),"Current temp:",y,"min:",min_temp,"max:",max_temp)
-    stat_rel=None
+    global stat_rel
 
     if y>max_temp:
         print(datetime.datetime.now(),"setting relay to OFF ...")
@@ -87,6 +85,12 @@ def process_state():
         print(datetime.datetime.now(),sys.exc_info())
 
 while True:
+    if not started:
+        try:
+            blynk = BlynkLib.Blynk(open('blynk.auth', "r").read().replace("\n",""))
+            started=True
+        except:
+            print(datetime.datetime.now(),sys.exc_info())
     try:
         blynk.run()
     except:
@@ -95,4 +99,4 @@ while True:
         process_state()
     except:
         print(datetime.datetime.now(),sys.exc_info())
-    time.sleep(2)
+    time.sleep(10)
