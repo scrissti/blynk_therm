@@ -23,11 +23,13 @@ min_temp=39
 max_temp=59
 started=False
 
-try:
-    blynk = BlynkLib.Blynk(open('blynk.auth', "r").read().replace("\n",""))
-    started=True
-except:
-    print(datetime.datetime.now(),sys.exc_info())
+while not started:
+    try:
+        blynk = BlynkLib.Blynk(open('blynk.auth', "r").read().replace("\n",""))
+        started=True
+    except:
+        print(datetime.datetime.now(),sys.exc_info())
+        time.sleep(10)
 
 def read_temp_raw():
     f = open(device_file, 'r')
@@ -84,13 +86,9 @@ def process_state():
     except:
         print(datetime.datetime.now(),sys.exc_info())
 
+
+
 while True:
-    if not started:
-        try:
-            blynk = BlynkLib.Blynk(open('blynk.auth', "r").read().replace("\n",""))
-            started=True
-        except:
-            print(datetime.datetime.now(),sys.exc_info())
     try:
         blynk.run()
     except:
