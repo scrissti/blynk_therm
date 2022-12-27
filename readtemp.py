@@ -16,7 +16,7 @@ device_file = device_folder + '/w1_slave'
 blynk=0
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(18, GPIO.OUT)
-GPIO.output(18, GPIO.LOW)
+GPIO.output(18, GPIO.HIGH)
 stat_rel=0
 print(datetime.datetime.now(),"Start up. setting relay to off.")
 min_temp=39
@@ -73,11 +73,11 @@ def process_state():
 
     if y>max_temp:
         print(datetime.datetime.now(),"setting relay to OFF ...")
-        GPIO.output(18, GPIO.LOW)
+        GPIO.output(18, GPIO.HIGH)
         stat_rel = 0
     if y<min_temp:
         print(datetime.datetime.now(),"setting relay to ON ...")
-        GPIO.output(18, GPIO.HIGH)
+        GPIO.output(18, GPIO.LOW)
         stat_rel = 1
     try:
         blynk.virtual_write(2,y)
